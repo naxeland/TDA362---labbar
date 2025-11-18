@@ -1,0 +1,10 @@
+^C:\USERS\NILSA\SOURCE\REPOS\TDA362\TDA362---LABBAR\LAB4-SHADING\CMAKELISTS.TXT
+setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SC:/Users/nilsa/source/repos/TDA362/TDA362---labbar -BC:/Users/nilsa/source/repos/TDA362/TDA362---labbar --check-stamp-file C:/Users/nilsa/source/repos/TDA362/TDA362---labbar/lab4-shading/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd

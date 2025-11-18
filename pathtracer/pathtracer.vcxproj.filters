@@ -1,0 +1,68 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="17.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="C:\Users\nilsa\source\repos\TDA362\TDA362---labbar\pathtracer\main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\nilsa\source\repos\TDA362\TDA362---labbar\pathtracer\Pathtracer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\nilsa\source\repos\TDA362\TDA362---labbar\pathtracer\sampling.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\nilsa\source\repos\TDA362\TDA362---labbar\pathtracer\HDRImage.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\nilsa\source\repos\TDA362\TDA362---labbar\pathtracer\embree.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\nilsa\source\repos\TDA362\TDA362---labbar\pathtracer\material.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="C:\Users\nilsa\source\repos\TDA362\TDA362---labbar\pathtracer\Pathtracer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\nilsa\source\repos\TDA362\TDA362---labbar\pathtracer\sampling.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\nilsa\source\repos\TDA362\TDA362---labbar\pathtracer\HDRImage.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\nilsa\source\repos\TDA362\TDA362---labbar\pathtracer\embree.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\nilsa\source\repos\TDA362\TDA362---labbar\pathtracer\material.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\nilsa\source\repos\TDA362\TDA362---labbar\pathtracer\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="C:\Users\nilsa\source\repos\TDA362\TDA362---labbar\pathtracer\copyTexture.frag">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="C:\Users\nilsa\source\repos\TDA362\TDA362---labbar\pathtracer\copyTexture.vert">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="C:\Users\nilsa\source\repos\TDA362\TDA362---labbar\pathtracer\simple.frag">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="C:\Users\nilsa\source\repos\TDA362\TDA362---labbar\pathtracer\simple.vert">
+      <Filter>Shaders</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{C274FF4C-0F3F-3BE8-8955-E7B05323CB12}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shaders">
+      <UniqueIdentifier>{5822668B-42B0-3928-A4C3-AAFCB0ECBA0C}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{7FDD4BDA-3A67-39BE-B77A-FE389CF17904}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

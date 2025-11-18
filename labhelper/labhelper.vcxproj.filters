@@ -1,0 +1,42 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="17.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="C:\Users\nilsa\source\repos\TDA362\TDA362---labbar\labhelper\labhelper.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\nilsa\source\repos\TDA362\TDA362---labbar\labhelper\Model.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\nilsa\source\repos\TDA362\TDA362---labbar\labhelper\hdr.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\nilsa\source\repos\TDA362\TDA362---labbar\labhelper\imgui_impl_sdl_gl3.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="C:\Users\nilsa\source\repos\TDA362\TDA362---labbar\labhelper\labhelper.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\nilsa\source\repos\TDA362\TDA362---labbar\labhelper\Model.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\nilsa\source\repos\TDA362\TDA362---labbar\labhelper\hdr.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\nilsa\source\repos\TDA362\TDA362---labbar\labhelper\imgui_impl_sdl_gl3.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\nilsa\source\repos\TDA362\TDA362---labbar\labhelper\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{C274FF4C-0F3F-3BE8-8955-E7B05323CB12}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{7FDD4BDA-3A67-39BE-B77A-FE389CF17904}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

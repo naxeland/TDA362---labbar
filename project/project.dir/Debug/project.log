@@ -1,0 +1,8 @@
+﻿  Building Custom Rule C:/Users/nilsa/source/repos/TDA362/TDA362---labbar/project/CMakeLists.txt
+  main.cpp
+  fbo.cpp
+  heightfield.cpp
+  ParticleSystem.cpp
+  Generating Code...
+     Creating library C:/Users/nilsa/source/repos/TDA362/TDA362---labbar/project/Debug/project.lib and object C:/Users/nilsa/source/repos/TDA362/TDA362---labbar/project/Debug/project.exp
+  project.vcxproj -> C:\Users\nilsa\source\repos\TDA362\TDA362---labbar\bin\project.exe

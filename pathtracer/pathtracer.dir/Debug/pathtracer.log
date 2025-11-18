@@ -1,0 +1,39 @@
+﻿  Building Custom Rule C:/Users/nilsa/source/repos/TDA362/TDA362---labbar/pathtracer/CMakeLists.txt
+  main.cpp
+C:\Users\nilsa\source\repos\TDA362\TDA362---labbar\pathtracer\Pathtracer.h(24,15): warning C4091: 'extern ': ignored on left of 'pathtracer::Settings' when no variable is declared
+  (compiling source file 'main.cpp')
+  
+C:\Users\nilsa\source\repos\TDA362\TDA362---labbar\pathtracer\Pathtracer.h(35,15): warning C4091: 'extern ': ignored on left of 'pathtracer::Environment' when no variable is declared
+  (compiling source file 'main.cpp')
+  
+C:\Users\nilsa\source\repos\TDA362\TDA362---labbar\pathtracer\Pathtracer.h(45,15): warning C4091: 'extern ': ignored on left of 'pathtracer::Image' when no variable is declared
+  (compiling source file 'main.cpp')
+  
+C:\Users\nilsa\source\repos\TDA362\TDA362---labbar\pathtracer\main.cpp(556,70): warning C4305: 'argument': truncation from 'double' to 'float'
+C:\Users\nilsa\source\repos\TDA362\TDA362---labbar\pathtracer\main.cpp(566,49): warning C4305: 'argument': truncation from 'double' to 'float'
+C:\Users\nilsa\source\repos\TDA362\TDA362---labbar\pathtracer\main.cpp(569,43): warning C4305: 'argument': truncation from 'double' to 'float'
+  Pathtracer.cpp
+C:\Users\nilsa\source\repos\TDA362\TDA362---labbar\pathtracer\Pathtracer.h(24,15): warning C4091: 'extern ': ignored on left of 'pathtracer::Settings' when no variable is declared
+  (compiling source file 'Pathtracer.cpp')
+  
+C:\Users\nilsa\source\repos\TDA362\TDA362---labbar\pathtracer\Pathtracer.h(35,15): warning C4091: 'extern ': ignored on left of 'pathtracer::Environment' when no variable is declared
+  (compiling source file 'Pathtracer.cpp')
+  
+C:\Users\nilsa\source\repos\TDA362\TDA362---labbar\pathtracer\Pathtracer.h(45,15): warning C4091: 'extern ': ignored on left of 'pathtracer::Image' when no variable is declared
+  (compiling source file 'Pathtracer.cpp')
+  
+  sampling.cpp
+  HDRImage.cpp
+  embree.cpp
+  material.cpp
+C:\Users\nilsa\source\repos\TDA362\TDA362---labbar\pathtracer\Pathtracer.h(24,15): warning C4091: 'extern ': ignored on left of 'pathtracer::Settings' when no variable is declared
+  (compiling source file 'material.cpp')
+  
+C:\Users\nilsa\source\repos\TDA362\TDA362---labbar\pathtracer\Pathtracer.h(35,15): warning C4091: 'extern ': ignored on left of 'pathtracer::Environment' when no variable is declared
+  (compiling source file 'material.cpp')
+  
+C:\Users\nilsa\source\repos\TDA362\TDA362---labbar\pathtracer\Pathtracer.h(45,15): warning C4091: 'extern ': ignored on left of 'pathtracer::Image' when no variable is declared
+  (compiling source file 'material.cpp')
+  
+  Generating Code...
+  pathtracer.vcxproj -> C:\Users\nilsa\source\repos\TDA362\TDA362---labbar\bin\pathtracer.exe

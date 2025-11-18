@@ -1,0 +1,17 @@
+{
+	"InstallScripts" : 
+	[
+		"C:/Users/nilsa/source/repos/TDA362/TDA362---labbar/cmake_install.cmake",
+		"C:/Users/nilsa/source/repos/TDA362/TDA362---labbar/labhelper/cmake_install.cmake",
+		"C:/Users/nilsa/source/repos/TDA362/TDA362---labbar/labhelper/imgui/cmake_install.cmake",
+		"C:/Users/nilsa/source/repos/TDA362/TDA362---labbar/lab1-rasterization/cmake_install.cmake",
+		"C:/Users/nilsa/source/repos/TDA362/TDA362---labbar/lab2-textures/cmake_install.cmake",
+		"C:/Users/nilsa/source/repos/TDA362/TDA362---labbar/lab3-camera/cmake_install.cmake",
+		"C:/Users/nilsa/source/repos/TDA362/TDA362---labbar/lab4-shading/cmake_install.cmake",
+		"C:/Users/nilsa/source/repos/TDA362/TDA362---labbar/lab5-rendertotexture/cmake_install.cmake",
+		"C:/Users/nilsa/source/repos/TDA362/TDA362---labbar/lab6-shadowmaps/cmake_install.cmake",
+		"C:/Users/nilsa/source/repos/TDA362/TDA362---labbar/pathtracer/cmake_install.cmake",
+		"C:/Users/nilsa/source/repos/TDA362/TDA362---labbar/project/cmake_install.cmake"
+	],
+	"Parallel" : false
+}

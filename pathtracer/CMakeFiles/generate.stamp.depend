@@ -1,0 +1,9 @@
+# CMake generation dependency list for this directory.
+C:/Program Files/CMake/share/cmake-4.2/Modules/CMakeParseImplicitLinkInfo.cmake
+C:/Program Files/CMake/share/cmake-4.2/Modules/FindOpenMP.cmake
+C:/Program Files/CMake/share/cmake-4.2/Modules/FindPackageHandleStandardArgs.cmake
+C:/Program Files/CMake/share/cmake-4.2/Modules/FindPackageMessage.cmake
+C:/Users/nilsa/source/repos/TDA362/TDA362---labbar/VSUserTemplate.user
+C:/Users/nilsa/source/repos/TDA362/TDA362---labbar/external/embree2/embree-config-version.cmake
+C:/Users/nilsa/source/repos/TDA362/TDA362---labbar/external/embree2/embree-config.cmake
+C:/Users/nilsa/source/repos/TDA362/TDA362---labbar/pathtracer/CMakeLists.txt

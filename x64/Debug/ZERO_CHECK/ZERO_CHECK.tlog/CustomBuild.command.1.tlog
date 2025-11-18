@@ -1,0 +1,10 @@
+^C:\USERS\NILSA\SOURCE\REPOS\TDA362\TDA362---LABBAR\CMAKEFILES\D162FD49B1E8EB1583844AB962B91E1B\GENERATE.STAMP.RULE
+setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SC:/Users/nilsa/source/repos/TDA362/TDA362---labbar -BC:/Users/nilsa/source/repos/TDA362/TDA362---labbar --check-stamp-list CMakeFiles/generate.stamp.list --vs-solution-file C:/Users/nilsa/source/repos/TDA362/TDA362---labbar/computer-graphics-labs.sln
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd

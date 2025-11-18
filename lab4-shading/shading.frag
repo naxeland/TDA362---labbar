@@ -62,21 +62,41 @@ vec3 calculateDirectIllumiunation(vec3 wo, vec3 n, vec3 base_color)
 	//            return vec3(0);
 	///////////////////////////////////////////////////////////////////////////
 
+	vec3 fragLight = viewSpaceLightPosition - viewSpacePosition;
+	float d = length(fragLight);
+	vec3 L_i = point_light_intensity_multiplier * point_light_color / (d*d);
+
+	vec3 w_i = normalize(fragLight);
+
+	if (dot(n, w_i) <= 0.0f)
+	{
+		return vec3(0.0f);
+	}
+	
 	///////////////////////////////////////////////////////////////////////////
 	// Task 1.3 - Calculate the diffuse term and return that as the result
 	///////////////////////////////////////////////////////////////////////////
-	// vec3 diffuse_term = ...
+	vec3 diffuse_term = base_color * (1.0f / PI) * length(n * w_i) * L_i;
 
 	///////////////////////////////////////////////////////////////////////////
 	// Task 2 - Calculate the Torrance Sparrow BRDF and return the light
 	//          reflected from that instead
 	///////////////////////////////////////////////////////////////////////////
 
+	vec3 w_h = normalize(wo + w_i);
+	float s = material_shininess;
+	float fresnel = material_fresnel + (1.0f - material_fresnel) * pow(1.0f - dot(w_h, w_i), 5);
+	float D_wh = (s + 2.0f) / (2.0f * PI) * pow(max(dot(n, w_h), 0.0), s);
+	float G = min(1, 2.0f * dot(n, w_h) * min(dot(n, wo) / dot(wo, w_h), dot(n, w_i) / dot(wo, w_h)));
+	float brdf = fresnel * D_wh * G / (4.0f * dot(n, wo) * dot(n, w_i));
+
 	///////////////////////////////////////////////////////////////////////////
 	// Task 3 - Make your shader respect the parameters of our material model.
 	///////////////////////////////////////////////////////////////////////////
-
-	return direct_illum;
+	vec3 dielectric_term = brdf * dot(n, w_i) * L_i + (1.0f - fresnel) * diffuse_term;
+	vec3 metal_term = brdf * base_color * dot(n, w_i) * L_i;
+	
+	return material_metalness * metal_term + (1.0f - material_metalness) * dielectric_term;
 }
 
 vec3 calculateIndirectIllumination(vec3 wo, vec3 n, vec3 base_color)
@@ -102,8 +122,8 @@ void main()
 	// Task 1.1 - Fill in the outgoing direction, wo, and the normal, n. Both
 	//            shall be normalized vectors in view-space.
 	///////////////////////////////////////////////////////////////////////////
-	vec3 wo = vec3(0.0);
-	vec3 n = vec3(0.0);
+	vec3 wo = normalize(-viewSpacePosition);
+	vec3 n = normalize(viewSpaceNormal);
 
 	vec3 base_color = material_color;
 	if(has_color_texture == 1)
@@ -124,7 +144,7 @@ void main()
 	///////////////////////////////////////////////////////////////////////////
 	// Task 1.4 - Make glowy things glow!
 	///////////////////////////////////////////////////////////////////////////
-	vec3 emission_term = vec3(0.0);
+	vec3 emission_term = material_emission;
 
 	vec3 final_color = direct_illumination_term + indirect_illumination_term + emission_term;
 

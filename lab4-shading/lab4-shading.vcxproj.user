@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="14.3" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">
+    <LocalDebuggerWorkingDirectory>C:/Users/nilsa/source/repos/TDA362/TDA362---labbar/bin</LocalDebuggerWorkingDirectory>
+    <LocalDebuggerEnvironment>PATH=C:/Users/nilsa/source/repos/TDA362/TDA362---labbar/external/bin;%PATH%</LocalDebuggerEnvironment>
+    <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <LocalDebuggerWorkingDirectory>C:/Users/nilsa/source/repos/TDA362/TDA362---labbar/bin</LocalDebuggerWorkingDirectory>
+    <LocalDebuggerEnvironment>PATH=C:/Users/nilsa/source/repos/TDA362/TDA362---labbar/external/bin;%PATH%</LocalDebuggerEnvironment>
+    <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <LocalDebuggerWorkingDirectory>C:/Users/nilsa/source/repos/TDA362/TDA362---labbar/bin</LocalDebuggerWorkingDirectory>
+    <LocalDebuggerEnvironment>PATH=C:/Users/nilsa/source/repos/TDA362/TDA362---labbar/external/bin;%PATH%</LocalDebuggerEnvironment>
+    <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">
+    <LocalDebuggerWorkingDirectory>C:/Users/nilsa/source/repos/TDA362/TDA362---labbar/bin</LocalDebuggerWorkingDirectory>
+    <LocalDebuggerEnvironment>PATH=C:/Users/nilsa/source/repos/TDA362/TDA362---labbar/external/bin;%PATH%</LocalDebuggerEnvironment>
+    <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ShowAllFiles>false</ShowAllFiles>
+  </PropertyGroup>
+</Project>
