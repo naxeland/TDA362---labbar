@@ -307,8 +307,8 @@ void initialize()
 	loadScenes();
 
 	// You can find the valid values for this in `loadScenes`: "Ship", "Material Test" and "Cube"
-	//changeScene("Ship");
-	changeScene("Material Test");
+	changeScene("Ship");
+	//changeScene("Material Test");
 	//changeScene("Cube");
 }
 

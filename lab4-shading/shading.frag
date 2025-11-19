@@ -101,18 +101,58 @@ vec3 calculateDirectIllumiunation(vec3 wo, vec3 n, vec3 base_color)
 
 vec3 calculateIndirectIllumination(vec3 wo, vec3 n, vec3 base_color)
 {
-	vec3 indirect_illum = vec3(0.f);
+	vec3 indirect_illum = vec3(0.0f);
 	///////////////////////////////////////////////////////////////////////////
 	// Task 5 - Lookup the irradiance from the irradiance map and calculate
 	//          the diffuse reflection
 	///////////////////////////////////////////////////////////////////////////
+	// Calculate the world-space position of this fragment on the near plane
+	vec3 n_ws = vec3(viewInverse * vec4(n, 0.0f));
+
+	// Calculate the spherical coordinates of the direction
+	float theta = acos(max(-1.0f, min(1.0f, n_ws.y)));
+	float phi = atan(n_ws.z, n_ws.x);
+	if(phi < 0.0f)
+	{
+		phi = phi + 2.0f * PI;
+	}
+	
+	// Use these to lookup the color in the environment map
+	vec2 lookup = vec2(phi / (2.0 * PI), 1 - theta / PI);
+
+	vec3 Li = environment_multiplier * texture2D(irradianceMap, lookup).rgb;
+	//return base_color * (1.0 / PI) * Li;
 
 	///////////////////////////////////////////////////////////////////////////
 	// Task 6 - Look up in the reflection map from the perfect specular
 	//          direction and calculate the dielectric and metal terms.
 	///////////////////////////////////////////////////////////////////////////
+	vec3 w_i = normalize(reflect(-wo, n));
+	vec3 wr = normalize(vec3(viewInverse * vec4(w_i, 0.0f)));
+	vec3 w_h = normalize(wo + w_i);
 
-	return indirect_illum;
+	theta = acos(max(-1.0f, min(1.0f, wr.y)));
+	phi = atan(wr.z, wr.x);
+	if(phi < 0.0f)
+	{
+		phi = phi + 2.0f * PI;
+	}
+	
+	// Use these to lookup the color in the environment map
+	lookup = vec2(phi / (2.0 * PI), 1 - theta / PI);
+
+
+	float roughness = sqrt(sqrt(2.0f / (material_shininess + 2.0f)));
+	Li = environment_multiplier * textureLod(reflectionMap, lookup, roughness * 7.0f).rgb;
+	vec3 fragLight = viewSpaceLightPosition - viewSpacePosition;
+
+	vec3 diffuse_term = base_color * (1.0f / PI) * length(n * w_i) * Li;
+	float fresnel = material_fresnel + (1.0f - material_fresnel) * pow(1.0f - dot(w_h, w_i), 5.0f);
+	vec3 dielectric_term = fresnel * Li + (1.0f - fresnel) * diffuse_term;
+	vec3 metal_term = fresnel * base_color * Li;
+
+
+	return material_metalness * metal_term + (1.0f - material_metalness) * dielectric_term;;
 }
 
 
