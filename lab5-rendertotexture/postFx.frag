@@ -74,7 +74,7 @@ void main()
 		fragmentColor = vec4(toSepiaTone(blur(mushrooms(gl_FragCoord.xy))), 1.0);
 		break;
 	case 6:
-		fragmentColor = vec4(0.0); // place holder
+		fragmentColor = textureRect(frameBufferTexture, floor(gl_FragCoord.xy / 22.0f) * 22.0f);
 		break;
 	case 7:
 		fragmentColor = vec4(0.0); // place holder
