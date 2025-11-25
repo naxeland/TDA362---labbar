@@ -8,6 +8,7 @@ layout(binding = 1) uniform sampler2D blurredFrameBufferTexture;
 uniform float time = 0.f;
 uniform int currentEffect = 1; // 1 as default, to know when the framebuffers are properly set
 uniform int filterSize = 1;
+uniform float color_shift = 0.0f;
 layout(location = 0) out vec4 fragmentColor;
 
 
@@ -47,7 +48,71 @@ vec3 grayscale(vec3 rgbSample);
  */
 vec3 toSepiaTone(vec3 rgbSample);
 
+vec3 rgb2hsv(vec3 rgb)
+{
+	float H;
+	float V = max(rgb.r, max(rgb.g, rgb.b));
+	float C = V - min(rgb.r, min(rgb.g, rgb.b));
+	float S = V > 0 ? C / V : 0;
 
+	if (C == 0)
+	{
+		H = 0;
+	}
+	else if (V == rgb.r)
+	{
+		H = fract(((rgb.g - rgb.b) / C) / 6.0);
+	}
+	else if (V == rgb.g)
+	{
+		H = fract((2 + (rgb.b - rgb.r) / C) / 6.0);
+	}
+	else if (V == rgb.b)
+	{
+		H = fract((4 + (rgb.r - rgb.g) / C) / 6.0);
+	}
+
+	return vec3(H, S, V);
+}
+
+vec3 hsv2rgb(vec3 hsv)
+{
+	float H = hsv.x;
+	float S = hsv.y;
+	float V = hsv.z;
+	vec3 tmp = vec3(0.0, 0.0, 0.0);
+	
+	float C = V * S;
+	float X = C * (1.0 - abs(mod(H * 6, 2.0) - 1.0));
+	float m = V - C;
+
+	if (H < 1/6.0)
+	{
+		tmp = vec3(C, X, 0);
+	}
+	else if (H < 2/6.0)
+	{
+		tmp = vec3(X, C, 0);
+	}
+	else if (H < 3/6.0)
+	{
+		tmp = vec3(0, C, X);
+	}
+	else if (H < 4/6.0)
+	{
+		tmp = vec3(0, X, C);
+	}
+	else if (H < 5/6.0)
+	{
+		tmp = vec3(X, 0, C);
+	}
+	else
+	{
+		tmp = vec3(C, 0, X);
+	}
+
+	return vec3(tmp.r + m, tmp.g + m, tmp.b + m);
+}
 
 
 void main()
@@ -77,16 +142,23 @@ void main()
 		fragmentColor = textureRect(frameBufferTexture, floor(gl_FragCoord.xy / 22.0f) * 22.0f);
 		break;
 	case 7:
-		fragmentColor = vec4(0.0); // place holder
+		fragmentColor = textureRect(blurredFrameBufferTexture, gl_FragCoord.xy);
 		break;
 	case 8:
-		fragmentColor = vec4(0.0); // place holder
+		fragmentColor = textureRect(frameBufferTexture, gl_FragCoord.xy)
+		                + textureRect(blurredFrameBufferTexture, gl_FragCoord.xy);
 		break;
 	case 9:
-		fragmentColor = vec4(0.0); // place holder
+		vec3 hsv = rgb2hsv(textureRect(frameBufferTexture, gl_FragCoord.xy).rgb);
+		hsv.r = fract(hsv.r + color_shift);
+		fragmentColor = vec4(hsv2rgb(hsv), 1);
+
 		break;
 	}
 }
+
+
+
 
 
 vec3 toSepiaTone(vec3 rgbSample)
