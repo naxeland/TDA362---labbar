@@ -23,6 +23,8 @@ layout(binding = 5) uniform sampler2D emissiveMap;
 layout(binding = 6) uniform sampler2D environmentMap;
 layout(binding = 7) uniform sampler2D irradianceMap;
 layout(binding = 8) uniform sampler2D reflectionMap;
+//layout(binding = 10) uniform sampler2D shadowMapTex;
+layout(binding = 10) uniform sampler2DShadow shadowMapTex;
 uniform float environment_multiplier;
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -42,12 +44,18 @@ uniform float point_light_intensity_multiplier = 50.0;
 in vec2 texCoord;
 in vec3 viewSpaceNormal;
 in vec3 viewSpacePosition;
+in vec4 shadowMapCoord;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Input uniform variables
 ///////////////////////////////////////////////////////////////////////////////
 uniform mat4 viewInverse;
 uniform vec3 viewSpaceLightPosition;
+uniform mat4 lightMatrix;
+uniform vec3 viewSpaceLightDir;
+uniform float spotInnerAngle;
+uniform float spotOuterAngle;
+
 
 ///////////////////////////////////////////////////////////////////////////////
 // Output color
@@ -59,12 +67,116 @@ layout(location = 0) out vec4 fragmentColor;
 
 vec3 calculateDirectIllumiunation(vec3 wo, vec3 n, vec3 base_color)
 {
-	return vec3(base_color);
+	vec3 direct_illum = base_color;
+	///////////////////////////////////////////////////////////////////////////
+	// Task 1.2 - Calculate the radiance Li from the light, and the direction
+	//            to the light. If the light is backfacing the triangle,
+	//            return vec3(0);
+	///////////////////////////////////////////////////////////////////////////
+
+	//float depth = texture(shadowMapTex, shadowMapCoord.xy / shadowMapCoord.w).x;
+	//float visibility = (depth >= (shadowMapCoord.z / shadowMapCoord.w)) ? 1.0 : 0.0;
+	float visibility = textureProj(shadowMapTex, shadowMapCoord);
+
+	vec3 posToLight = normalize(viewSpaceLightPosition - viewSpacePosition);
+	float cosAngle = dot(posToLight, -viewSpaceLightDir);
+
+	// Spotlight with hard border:
+	float spotAttenuation = smoothstep(spotOuterAngle, spotInnerAngle, cosAngle);
+	visibility *= spotAttenuation;
+
+	vec3 fragLight = viewSpaceLightPosition - viewSpacePosition;
+	float d = length(fragLight);
+	vec3 L_i = point_light_intensity_multiplier * point_light_color / (d*d);
+
+	vec3 w_i = normalize(fragLight);
+
+	if (dot(n, w_i) <= 0.0f)
+	{
+		return vec3(0.0f);
+	}
+	
+	///////////////////////////////////////////////////////////////////////////
+	// Task 1.3 - Calculate the diffuse term and return that as the result
+	///////////////////////////////////////////////////////////////////////////
+	vec3 diffuse_term = base_color * (1.0f / PI) * length(n * w_i) * L_i;
+
+	///////////////////////////////////////////////////////////////////////////
+	// Task 2 - Calculate the Torrance Sparrow BRDF and return the light
+	//          reflected from that instead
+	///////////////////////////////////////////////////////////////////////////
+
+
+	vec3 w_h = normalize(wo + w_i);
+	float s = material_shininess;
+	float fresnel = material_fresnel + (1.0f - material_fresnel) * pow(1.0f - dot(w_h, w_i), 5);
+	float D_wh = (s + 2.0f) / (2.0f * PI) * pow(max(dot(n, w_h), 0.0), s);
+	float G = min(1, 2.0f * dot(n, w_h) * min(dot(n, wo) / dot(wo, w_h), dot(n, w_i) / dot(wo, w_h)));
+	float brdf = fresnel * D_wh * G / (4.0f * dot(n, wo) * dot(n, w_i));
+
+	///////////////////////////////////////////////////////////////////////////
+	// Task 3 - Make your shader respect the parameters of our material model.
+	///////////////////////////////////////////////////////////////////////////
+	vec3 dielectric_term = brdf * dot(n, w_i) * L_i + (1.0f - fresnel) * diffuse_term;
+	vec3 metal_term = brdf * base_color * dot(n, w_i) * L_i;
+	
+	return (material_metalness * metal_term + (1.0f - material_metalness) * dielectric_term) * visibility;
 }
 
 vec3 calculateIndirectIllumination(vec3 wo, vec3 n, vec3 base_color)
 {
-	return vec3(0.0);
+	vec3 indirect_illum = vec3(0.0f);
+	///////////////////////////////////////////////////////////////////////////
+	// Task 5 - Lookup the irradiance from the irradiance map and calculate
+	//          the diffuse reflection
+	///////////////////////////////////////////////////////////////////////////
+	// Calculate the world-space position of this fragment on the near plane
+	vec3 n_ws = vec3(viewInverse * vec4(n, 0.0f));
+
+	// Calculate the spherical coordinates of the direction
+	float theta = acos(max(-1.0f, min(1.0f, n_ws.y)));
+	float phi = atan(n_ws.z, n_ws.x);
+	if(phi < 0.0f)
+	{
+		phi = phi + 2.0f * PI;
+	}
+	
+	// Use these to lookup the color in the environment map
+	vec2 lookup = vec2(phi / (2.0 * PI), 1 - theta / PI);
+
+	vec3 Li = environment_multiplier * texture2D(irradianceMap, lookup).rgb;
+	//return base_color * (1.0 / PI) * Li;
+
+	///////////////////////////////////////////////////////////////////////////
+	// Task 6 - Look up in the reflection map from the perfect specular
+	//          direction and calculate the dielectric and metal terms.
+	///////////////////////////////////////////////////////////////////////////
+	vec3 w_i = normalize(reflect(-wo, n));
+	vec3 wr = normalize(vec3(viewInverse * vec4(w_i, 0.0f)));
+	vec3 w_h = normalize(wo + w_i);
+
+	theta = acos(max(-1.0f, min(1.0f, wr.y)));
+	phi = atan(wr.z, wr.x);
+	if(phi < 0.0f)
+	{
+		phi = phi + 2.0f * PI;
+	}
+		
+	// Use these to lookup the color in the environment map
+	lookup = vec2(phi / (2.0 * PI), 1 - theta / PI);
+
+
+	float roughness = sqrt(sqrt(2.0f / (material_shininess + 2.0f)));
+	Li = environment_multiplier * textureLod(reflectionMap, lookup, roughness * 7.0f).rgb;
+	vec3 fragLight = viewSpaceLightPosition - viewSpacePosition;
+
+	vec3 diffuse_term = base_color * (1.0f / PI) * length(n * w_i) * Li;
+	float fresnel = material_fresnel + (1.0f - material_fresnel) * pow(1.0f - dot(w_h, w_i), 5.0f);
+	vec3 dielectric_term = fresnel * Li + (1.0f - fresnel) * diffuse_term;
+	vec3 metal_term = fresnel * base_color * Li;
+
+
+	return material_metalness * metal_term + (1.0f - material_metalness) * dielectric_term;;
 }
 
 void main()
