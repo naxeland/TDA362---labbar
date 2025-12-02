@@ -23,7 +23,6 @@ layout(binding = 5) uniform sampler2D emissiveMap;
 layout(binding = 6) uniform sampler2D environmentMap;
 layout(binding = 7) uniform sampler2D irradianceMap;
 layout(binding = 8) uniform sampler2D reflectionMap;
-//layout(binding = 10) uniform sampler2D shadowMapTex;
 layout(binding = 10) uniform sampler2DShadow shadowMapTex;
 uniform float environment_multiplier;
 
@@ -55,6 +54,9 @@ uniform mat4 lightMatrix;
 uniform vec3 viewSpaceLightDir;
 uniform float spotInnerAngle;
 uniform float spotOuterAngle;
+uniform bool useSoftFalloff;
+uniform bool useSpotLight;
+uniform bool useHardwarePCF;
 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -74,16 +76,32 @@ vec3 calculateDirectIllumiunation(vec3 wo, vec3 n, vec3 base_color)
 	//            return vec3(0);
 	///////////////////////////////////////////////////////////////////////////
 
-	//float depth = texture(shadowMapTex, shadowMapCoord.xy / shadowMapCoord.w).x;
-	//float visibility = (depth >= (shadowMapCoord.z / shadowMapCoord.w)) ? 1.0 : 0.0;
-	float visibility = textureProj(shadowMapTex, shadowMapCoord);
+	float visibility = 1.0;
+	if (useHardwarePCF)
+	{
+		visibility = textureProj(shadowMapTex, shadowMapCoord);
+	}
+	else
+	{
+		float depth = textureProj(shadowMapTex, shadowMapCoord); //texture(shadowMapTex, shadowMapCoord.xy / shadowMapCoord.w).x;
+		visibility = (depth >= (shadowMapCoord.z / shadowMapCoord.w)) ? 1.0 : 0.0;
+	}
 
 	vec3 posToLight = normalize(viewSpaceLightPosition - viewSpacePosition);
 	float cosAngle = dot(posToLight, -viewSpaceLightDir);
 
 	// Spotlight with hard border:
-	float spotAttenuation = smoothstep(spotOuterAngle, spotInnerAngle, cosAngle);
-	visibility *= spotAttenuation;
+	float spotAttenuation = step(spotInnerAngle, cosAngle);
+	if (useSoftFalloff)
+	{
+		spotAttenuation = smoothstep(spotOuterAngle, spotInnerAngle, cosAngle);
+	}
+	
+	if (useSpotLight)
+	{
+		visibility *= spotAttenuation;
+	}
+	
 
 	vec3 fragLight = viewSpaceLightPosition - viewSpacePosition;
 	float d = length(fragLight);

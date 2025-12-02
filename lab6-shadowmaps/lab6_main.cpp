@@ -79,8 +79,8 @@ int shadowMapResolution = 128;
 int shadowMapClampMode = ClampMode::Edge;
 bool shadowMapClampBorderShadowed = false;
 bool usePolygonOffset = true;
-bool useSoftFalloff = false;
-bool useHardwarePCF = false;
+bool useSoftFalloff = true;
+bool useHardwarePCF = true;
 float polygonOffset_factor = .25f;
 float polygonOffset_units = 1.0f;
 
@@ -279,6 +279,9 @@ void drawScene(GLuint currentShaderProgram,
 	                          normalize(vec3(viewMatrix * vec4(-lightPosition, 0.0f))));
 	labhelper::setUniformSlow(currentShaderProgram, "spotOuterAngle", std::cos(radians(outerSpotlightAngle)));
 	labhelper::setUniformSlow(currentShaderProgram, "spotInnerAngle", std::cos(radians(innerSpotlightAngle)));
+	labhelper::setUniformSlow(currentShaderProgram, "useSpotLight", useSpotLight);
+	labhelper::setUniformSlow(currentShaderProgram, "useHardwarePCF", useHardwarePCF);
+	labhelper::setUniformSlow(currentShaderProgram, "useSoftFalloff", useSoftFalloff);
 
 	glActiveTexture(GL_TEXTURE10);
 	glBindTexture(GL_TEXTURE_2D, shadowMapFB.depthBuffer);
@@ -372,19 +375,19 @@ void display(void)
 	// This line is to avoid some warnings from OpenGL for having the shadowmap attached to texture unit 0
 	// when using a shader that samples from that texture with a sampler2D instead of a shadow sampler.
 	// It is never actually sampled, but just having it set there generates the warning in some systems.
-	/*glBindTexture(GL_TEXTURE_2D, 0);
+	glBindTexture(GL_TEXTURE_2D, shadowMapFB.depthBuffer);
 
-
-	glBindTexture(GL_TEXTURE_2D, shadowMapFB.depthBuffer);*/
-
-	if (useHardwarePCF) {
+	if (useHardwarePCF == true) {
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	}
-	else {
+	else if (useHardwarePCF == false) {
+
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	}
+
+	glBindTexture(GL_TEXTURE_2D, 0);
 
 	///////////////////////////////////////////////////////////////////////////
 	// Draw Shadow Map
