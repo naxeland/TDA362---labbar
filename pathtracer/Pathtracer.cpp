@@ -69,7 +69,72 @@ vec3 Lenvironment(const vec3& wi)
 ///////////////////////////////////////////////////////////////////////////
 vec3 Li(Ray& primary_ray)
 {
-	vec3 L = vec3(0.0f);
+	vec3 L = vec3(0.0f, 0.0f, 0.0f);
+	vec3 pathThroughput = vec3(1.0, 1.0, 1.0);
+	Ray current_ray = primary_ray;
+	for (int bounces = 0; bounces < settings.max_bounces; bounces++)
+	{
+		// Get the intersection information from the ray
+		Intersection hit = getIntersection(current_ray);
+
+		// Create a Material tree
+		Diffuse diffuse(hit.material->m_color);
+		BTDF& mat = diffuse;
+
+		// Direct illumination
+		//L += pathThroughput * direct illumination from light if visible
+		vec3 point = hit.position + hit.shading_normal * EPSILON;
+		vec3 dir_to_light = normalize(point_light.position - point);
+		Ray ray = Ray(point, dir_to_light);
+		
+		if (!occluded(ray))
+		{
+			const float distance_to_light = length(point_light.position - hit.position);
+			const float falloff_factor = 1.0f / (distance_to_light * distance_to_light);
+			vec3 Li = point_light.intensity_multiplier * point_light.color * falloff_factor;
+			vec3 wi = normalize(point_light.position - hit.position);
+			L += mat.f(wi, hit.wo, hit.shading_normal) * Li * std::max(0.0f, dot(wi, hit.shading_normal));
+		}
+
+        // Add emitted radiance from intersection
+        if(hit.material->m_emission != vec3(0.0f)) {
+        L += pathThroughput * hit.material->m_emission;
+        }
+		//L += pathThroughput * emitted light;
+
+		// Sample an incoming direction (and the brdf and pdf for that direction)
+		//(wi, f, pdf) = mat.sample_wi(hit.wo, hit.shading_normal)
+		WiSample wiSample = mat.sample_wi(hit.wo, hit.shading_normal);
+
+		// If the pdf is too close to zero, it means that the current path is extremely
+		// unlikely to exist, so we break to avoid numerical instability
+		if (wiSample.pdf < EPSILON) return L;
+
+		float cosineterm = abs(dot(wiSample.wi, hit.shading_normal));
+
+		pathThroughput = pathThroughput * (wiSample.f * cosineterm) / wiSample.pdf;
+
+		// If pathThroughput is zero there is no need to continue, as no more light comes from this path
+		if (pathThroughput == vec3(0, 0, 0)) {
+			return L;
+		}
+		// Create next ray on path (existing instance can't be reused)
+		//current_ray < -Create new ray instance from intersection point in outgoing direction
+		current_ray = Ray(hit.position, wiSample.wi);
+
+		// Bias the ray slightly to avoid self-intersection 
+		current_ray.o += EPSILON * hit.shading_normal;
+
+		// Intersect the new ray and if there is no intersection just
+		// add environment contribution and finish
+		if (!intersect(current_ray))
+			return L + pathThroughput * Lenvironment(current_ray.d);
+
+		// Otherwise, reiterate for the new intersection
+	}
+
+	return L;
+	/*vec3 L = vec3(0.0f);
 	vec3 path_throughput = vec3(1.0);
 	Ray current_ray = primary_ray;
 
@@ -77,13 +142,26 @@ vec3 Li(Ray& primary_ray)
 	// Get the intersection information from the ray
 	///////////////////////////////////////////////////////////////////
 	Intersection hit = getIntersection(current_ray);
+
+	vec3 point = hit.position + hit.shading_normal * EPSILON;
+	vec3 dir_to_light = normalize(point_light.position - point);
+	Ray ray = Ray(point, dir_to_light);
+	if (occluded(ray))
+	{
+		return vec3(0);
+	}
+
 	///////////////////////////////////////////////////////////////////
 	// Create a Material tree for evaluating brdfs and calculating
 	// sample directions.
 	///////////////////////////////////////////////////////////////////
 
 	Diffuse diffuse(hit.material->m_color);
-	BTDF& mat = diffuse;
+	MicrofacetBRDF microfacet(hit.material->m_shininess);
+	DielectricBSDF dielectric(&microfacet, &diffuse, hit.material->m_fresnel);
+	MetalBSDF metal(&microfacet, hit.material->m_color, hit.material->m_fresnel);
+	BSDFLinearBlend metal_blend(hit.material->m_metalness, &metal, &dielectric);
+	BSDF& mat = metal_blend;
 	///////////////////////////////////////////////////////////////////
 	// Calculate Direct Illumination from light.
 	///////////////////////////////////////////////////////////////////
@@ -94,8 +172,9 @@ vec3 Li(Ray& primary_ray)
 		vec3 wi = normalize(point_light.position - hit.position);
 		L = mat.f(wi, hit.wo, hit.shading_normal) * Li * std::max(0.0f, dot(wi, hit.shading_normal));
 	}
+
 	// Return the final outgoing radiance for the primary ray
-	return L;
+	return L;*/
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -133,8 +212,8 @@ void tracePaths(const glm::mat4& V, const glm::mat4& P)
 			primaryRay.o = camera_pos;
 			// Create a ray that starts in the camera position and points toward
 			// the current pixel on a virtual screen.
-			vec2 screenCoord = vec2(float(x) / float(rendered_image.width),
-			                        float(y) / float(rendered_image.height));
+			vec2 screenCoord = vec2((float(x) + randf()) / float(rendered_image.width),
+			                        (float(y) + randf()) / float(rendered_image.height));
 			// Calculate direction
 			vec4 viewCoord = vec4(screenCoord.x * 2.0f - 1.0f, screenCoord.y * 2.0f - 1.0f, 1.0f, 1.0f);
 			vec3 p = homogenize(inverse(P * V) * viewCoord);

@@ -3,6 +3,7 @@
 #include "labhelper.h"
 
 using namespace labhelper;
+#define PI 3.14159265359
 
 namespace pathtracer
 {
@@ -38,7 +39,12 @@ WiSample Diffuse::sample_wi(const vec3& wo, const vec3& n) const
 
 vec3 MicrofacetBRDF::f(const vec3& wi, const vec3& wo, const vec3& n) const
 {
-	return vec3(0.0f);
+	float s = shininess;
+	vec3 wh = normalize(wo + wi);
+	float D_wh = (s + 2.0f) / (2.0f * PI) * pow(max(dot(n, wh), 0.0f), s);
+	float G = min(1.0f, 2.0f * dot(n, wh) * min(dot(n, wo) / dot(wo, wh), dot(n, wi) / dot(wo, wh)));
+	float brdf = D_wh * G / (4.0f * dot(n, wo) * dot(n, wi));
+	return vec3(brdf);
 }
 
 WiSample MicrofacetBRDF::sample_wi(const vec3& wo, const vec3& n) const
@@ -52,13 +58,15 @@ WiSample MicrofacetBRDF::sample_wi(const vec3& wo, const vec3& n) const
 
 float BSDF::fresnel(const vec3& wi, const vec3& wo) const
 {
-	return 0.0f;
+	vec3 wh = normalize(wo + wi);
+	return R0 + (1.0f - R0) * powf(1.0f - dot(wh, wi), 5.0f);
 }
 
 
 vec3 DielectricBSDF::f(const vec3& wi, const vec3& wo, const vec3& n) const
 {
-	return vec3(0);
+	float Fwi = fresnel(wi, wo);
+	return Fwi * reflective_material->f(wi, wo, n) + (1.0f - Fwi) * transmissive_material->f(wi, wo, n);
 }
 
 WiSample DielectricBSDF::sample_wi(const vec3& wo, const vec3& n) const
@@ -73,7 +81,8 @@ WiSample DielectricBSDF::sample_wi(const vec3& wo, const vec3& n) const
 
 vec3 MetalBSDF::f(const vec3& wi, const vec3& wo, const vec3& n) const
 {
-	return vec3(0);
+	float Fwi = fresnel(wi, wo);
+	return Fwi * reflective_material->f(wi, wo, n) * color;
 }
 
 WiSample MetalBSDF::sample_wi(const vec3& wo, const vec3& n) const
@@ -87,7 +96,7 @@ WiSample MetalBSDF::sample_wi(const vec3& wo, const vec3& n) const
 
 vec3 BSDFLinearBlend::f(const vec3& wi, const vec3& wo, const vec3& n) const
 {
-	return vec3(0.0);
+	return w * bsdf0->f(wi, wo, n) + (1.0f - w) * bsdf1->f(wi, wo, n);
 }
 
 WiSample BSDFLinearBlend::sample_wi(const vec3& wo, const vec3& n) const
