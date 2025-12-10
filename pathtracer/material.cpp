@@ -49,8 +49,25 @@ vec3 MicrofacetBRDF::f(const vec3& wi, const vec3& wo, const vec3& n) const
 
 WiSample MicrofacetBRDF::sample_wi(const vec3& wo, const vec3& n) const
 {
-	WiSample r = sampleHemisphereCosine(wo, n);
+	WiSample r;
+	//r.f = f(r.wi, wo, n);
+
+	vec3 tangent = normalize(perpendicular(n));
+	vec3 bitangent = normalize(cross(tangent, n));
+	float phi = 2.0f * M_PI * randf();
+	float cos_theta = pow(randf(), 1.0f / (shininess + 1));
+	float sin_theta = sqrt(max(0.0f, 1.0f - cos_theta * cos_theta));
+	vec3 wh = normalize(sin_theta * cos(phi) * tangent +
+		sin_theta * sin(phi) * bitangent +
+		cos_theta * n);
+
+	float pwh = (shininess + 1) * pow(dot(n, wh), shininess) / (2 * M_PI);
+
+	float pwi = ( pwh / (4*dot(wo, wh)));
+	
+	r.wi = normalize(-wo + 2.0f * dot(wo, wh) * wh);
 	r.f = f(r.wi, wo, n);
+	r.pdf = pwi;
 
 	return r;
 }
@@ -73,10 +90,29 @@ WiSample DielectricBSDF::sample_wi(const vec3& wo, const vec3& n) const
 {
 	WiSample r;
 
-	r = sampleHemisphereCosine(wo, n);
-	r.f = f(r.wi, wo, n);
+	if (randf() < 0.5)
+	{
+			// Sample the BRDF
+			r = reflective_material->sample_wi(wo, n);
+			r.pdf *= 0.5;
+			float F = fresnel(r.wi, wo);
+			r.f *= F;
+	}
+	else
+	{
+			// Sample the BTDF
+			r = transmissive_material->sample_wi(wo, n);
+			r.pdf *= 0.5;
+			float F = fresnel(r.wi, wo);
+			r.f *= (1 - F);
+	}
 
 	return r;
+
+	/*r = sampleHemisphereCosine(wo, n);
+	r.f = f(r.wi, wo, n);
+
+	return r;*/
 }
 
 vec3 MetalBSDF::f(const vec3& wi, const vec3& wo, const vec3& n) const
@@ -87,10 +123,14 @@ vec3 MetalBSDF::f(const vec3& wi, const vec3& wo, const vec3& n) const
 
 WiSample MetalBSDF::sample_wi(const vec3& wo, const vec3& n) const
 {
-	WiSample r;
+	//return reflective_material->f(wi, wo, n) * fresnel(wi, wo) * color;
+	WiSample r = reflective_material->sample_wi(wo, n);
+	r.f *= fresnel(r.wi, wo) * color;
+	return r;
+	/*WiSample r;
 	r = sampleHemisphereCosine(wo, n);
 	r.f = f(r.wi, wo, n);
-	return r;
+	return r;*/
 }
 
 
@@ -101,7 +141,24 @@ vec3 BSDFLinearBlend::f(const vec3& wi, const vec3& wo, const vec3& n) const
 
 WiSample BSDFLinearBlend::sample_wi(const vec3& wo, const vec3& n) const
 {
-	return WiSample{};
+	//return WiSample{};
+
+	WiSample r;
+
+	if (randf() < w)
+	{
+		r = bsdf0->sample_wi(wo, n);
+		/*float F = fresnel(r.wi, wo);
+		r.f *= F;*/
+	}
+	else
+	{
+		r = bsdf1->sample_wi(wo, n);
+		/*float F = fresnel(r.wi, wo);
+		r.f *= (1 - F);*/
+	}
+
+	return r;
 }
 
 

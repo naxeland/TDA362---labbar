@@ -79,7 +79,11 @@ vec3 Li(Ray& primary_ray)
 
 		// Create a Material tree
 		Diffuse diffuse(hit.material->m_color);
-		BTDF& mat = diffuse;
+		MicrofacetBRDF microfacet(hit.material->m_shininess);
+		DielectricBSDF dielectric(&microfacet, &diffuse, hit.material->m_fresnel);
+		MetalBSDF metal(&microfacet, hit.material->m_color, hit.material->m_fresnel);
+		BSDFLinearBlend metal_blend(hit.material->m_metalness, &metal, &dielectric);
+		BSDF& mat = metal_blend;
 
 		// Direct illumination
 		//L += pathThroughput * direct illumination from light if visible
@@ -93,13 +97,13 @@ vec3 Li(Ray& primary_ray)
 			const float falloff_factor = 1.0f / (distance_to_light * distance_to_light);
 			vec3 Li = point_light.intensity_multiplier * point_light.color * falloff_factor;
 			vec3 wi = normalize(point_light.position - hit.position);
-			L += mat.f(wi, hit.wo, hit.shading_normal) * Li * std::max(0.0f, dot(wi, hit.shading_normal));
+			L += pathThroughput * mat.f(wi, hit.wo, hit.shading_normal) * Li * std::max(0.0f, dot(wi, hit.shading_normal));
 		}
 
         // Add emitted radiance from intersection
-        if(hit.material->m_emission != vec3(0.0f)) {
-        L += pathThroughput * hit.material->m_emission;
-        }
+    if(hit.material->m_emission != vec3(0.0f)) {
+      L += pathThroughput * hit.material->m_emission;
+    }
 		//L += pathThroughput * emitted light;
 
 		// Sample an incoming direction (and the brdf and pdf for that direction)
@@ -120,10 +124,10 @@ vec3 Li(Ray& primary_ray)
 		}
 		// Create next ray on path (existing instance can't be reused)
 		//current_ray < -Create new ray instance from intersection point in outgoing direction
-		current_ray = Ray(hit.position, wiSample.wi);
+		current_ray = Ray(point, wiSample.wi);
 
 		// Bias the ray slightly to avoid self-intersection 
-		current_ray.o += EPSILON * hit.shading_normal;
+		//current_ray.o += EPSILON * hit.shading_normal;
 
 		// Intersect the new ray and if there is no intersection just
 		// add environment contribution and finish
